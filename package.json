@@ -16,5 +16,10 @@
     "url": "https://github.com/jfzepeda/yssm-distribuidor/issues"
   },
   "homepage": "https://github.com/jfzepeda/yssm-distribuidor#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.16.3"
+  }
 }
