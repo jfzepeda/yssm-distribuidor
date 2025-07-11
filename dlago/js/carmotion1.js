@@ -80,24 +80,24 @@ function separarUltimosDosDigitosRegex(numero, id) {
       const precioMX =
         parseFloat(valorSinSimbolo) > 10 ? parseFloat(valorSinSimbolo) : 0;
 
-      await client.query(
-        `INSERT INTO productos
-          (claveproveedor, productos, cantidad, proveedorp, categoria, idunicoinvetariado, precio, creado, rin, estadociudad, size)
-         VALUES
-          ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, $9, $10)`,
-        [
-          id,
-          obj.value.b,
-          obj.value.c || 0,
-          "Carmotion",
-          vermarca[1].toLowerCase(),
-          require("crypto").randomUUID(),
-          precioMX,
-          extra[1], // rin
-          "1", // estadociudad fijo
-          extra[0], // size
-        ]
-      );
+      // await client.query(
+      //   `INSERT INTO productos
+      //     (claveproveedor, productos, cantidad, proveedorp, categoria, idunicoinvetariado, precio, creado, rin, estadociudad, size)
+      //    VALUES
+      //     ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, $9, $10)`,
+      //   [
+      //     id,
+      //     obj.value.b,
+      //     obj.value.c || 0,
+      //     "Carmotion",
+      //     vermarca[1].toLowerCase(),
+      //     require("crypto").randomUUID(),
+      //     precioMX,
+      //     extra[1], // rin
+      //     "1", // estadociudad fijo
+      //     extra[0], // size
+      //   ]
+      // );
       console.debug(
         id,
         obj.value.b,
