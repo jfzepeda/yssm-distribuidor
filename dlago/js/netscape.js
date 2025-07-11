@@ -1,20 +1,24 @@
 const fetch = require('node-fetch');
 const { pool } = require('./DB');
 
-async function grupotersa() {
+async function netscape() {
   const username = 'administracion@yantissimo.com';
   const password = ')9Jx19PW';
   const cookies = [];
 
   const loginRes = await fetch('http://www.asociados.grupotersa.com.mx/yokozuna/auth/login', {
     method: 'POST',
-    headers: { 'User-Agent': 'Mozilla/5.0', 'Content-Type': 'application/x-www-form-urlencoded' },
+    headers: {
+      'User-Agent': 'Mozilla/5.0',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
     body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
   });
   cookies.push(...(loginRes.headers.raw()['set-cookie'] || []));
-  const { token } = await loginRes.json();
+  const v = await loginRes.json();
+  const token = v.token;
 
-  const res = await fetch('http://www.asociados.grupotersa.com.mx/api/inventory', {
+  const inventory = await fetch('http://www.asociados.grupotersa.com.mx/api/inventory', {
     headers: {
       'User-Agent': 'Mozilla/5.0',
       'Cookie': cookies.map(c => c.split(';')[0]).join('; '),
@@ -22,7 +26,8 @@ async function grupotersa() {
       'Accept': 'application/json'
     }
   });
-  const arr = await res.json();
+  const arr = await inventory.json();
+
   for (const obj of arr) {
     const id = `gt-${obj.id}`;
     const precio = parseFloat(obj.price) || 0;
@@ -34,7 +39,8 @@ async function grupotersa() {
       [id, `${obj.brand} ${obj.series}`, obj.fullInventory, 'Grupo Tersa', obj.brand.toLowerCase(), id, precio, obj.rim, '1', obj.size]
     );
   }
+
   console.log('ok');
 }
 
-module.exports = { grupotersa };
+module.exports = { netscape };
