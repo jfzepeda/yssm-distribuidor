@@ -35,30 +35,64 @@ connection.connect((err) => {
     if (results.length === 0) {
       console.log("No hay productos disponibles.");
     } else {
-      for (const producto of results) {
-        try {
-          await client.query(
-            `INSERT INTO productos
-              (claveproveedor, productos, cantidad, proveedorp, categoria, idunicoinvetariado, precio, creado, rin, estadociudad, size)
-            VALUES
-              ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
-            [
-              producto.claveproveedor,
-              producto.productos,
-              producto.cantidad,
-              producto.proveedorp,
-              producto.categoria,
-              crypto.randomUUID(),
-              producto.precio,
-              producto.creado,
-              producto.rin,
-              "1",
-              producto.size,
-            ]
+      const columns = [
+        "claveproveedor",
+        "productos",
+        "cantidad",
+        "proveedorp",
+        "categoria",
+        "idunicoinvetariado",
+        "precio",
+        "creado",
+        "rin",
+        "estadociudad",
+        "size",
+      ];
+      const chunkSize = 1000;
+      for (let i = 0; i < results.length; i += chunkSize) {
+        const chunk = results.slice(i, i + chunkSize);
+        const placeholders = [];
+        const values = [];
+        chunk.forEach((producto, j) => {
+          const baseIndex = j * columns.length;
+          placeholders.push(
+            `($${baseIndex + 1}, $${baseIndex + 2}, $${baseIndex + 3}, $${
+              baseIndex + 4
+            }, $${baseIndex + 5}, $${baseIndex + 6}, $${baseIndex + 7}, $${
+              baseIndex + 8
+            }, $${baseIndex + 9}, $${baseIndex + 10}, $${baseIndex + 11})`
           );
-          console.log(`Inserted producto ID ${producto.id}`);
+          values.push(
+            producto.claveproveedor,
+            producto.productos,
+            producto.cantidad,
+            producto.proveedorp,
+            producto.categoria,
+            crypto.randomUUID(),
+            producto.precio,
+            producto.creado,
+            producto.rin,
+            "1",
+            producto.size
+          );
+        });
+        const sql = `
+          INSERT INTO productos (${columns.join(", ")})
+          VALUES ${placeholders.join(", ")}
+        `;
+        try {
+          await client.query("BEGIN");
+          await client.query(sql, values);
+          await client.query("COMMIT");
+          console.log(
+            `Inserted ${chunk.length} productos in bulk (batch ${
+              i / chunkSize + 1
+            })`
+          );
         } catch (error) {
-          console.error("Error inserting producto:", error);
+          await client.query("ROLLBACK");
+          console.error("Error inserting productos in bulk:", error);
+          // Mostrar objeto con error
         }
       }
     }
