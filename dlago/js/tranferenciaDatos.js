@@ -47,7 +47,10 @@ connection.connect((err) => {
         "rin",
         "estadociudad",
         "size",
+        "actualizado", // columna agregada
       ];
+      await client.query("DELETE FROM productos"); // Limpiar la tabla antes de insertar nuevos datos
+      console.log("Tabla productos limpiada, comenzando inserción de datos...");
       const chunkSize = 1000;
       for (let i = 0; i < results.length; i += chunkSize) {
         const chunk = results.slice(i, i + chunkSize);
@@ -60,7 +63,9 @@ connection.connect((err) => {
               baseIndex + 4
             }, $${baseIndex + 5}, $${baseIndex + 6}, $${baseIndex + 7}, $${
               baseIndex + 8
-            }, $${baseIndex + 9}, $${baseIndex + 10}, $${baseIndex + 11})`
+            }, $${baseIndex + 9}, $${baseIndex + 10}, $${baseIndex + 11}, $${
+              baseIndex + 12
+            })`
           );
           values.push(
             producto.claveproveedor,
@@ -73,7 +78,8 @@ connection.connect((err) => {
             producto.creado,
             producto.rin,
             "1",
-            producto.size
+            producto.size,
+            producto.actualizado || null
           );
         });
         const sql = `
